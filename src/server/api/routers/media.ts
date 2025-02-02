@@ -1,0 +1,73 @@
+import { z } from "zod";
+
+import CheckIfAdmin from "@/lib/check-if-admin";
+import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { db } from "@/server/db";
+import { media } from "@/server/db/schema";
+import { auth } from "@clerk/nextjs/server";
+import { desc, eq } from "drizzle-orm";
+import { UTApi } from "uploadthing/server";
+
+export const mediaRouter = createTRPCRouter({
+  getAll: publicProcedure.query(async () => {
+    const allMedia = await db.query.media.findMany({
+      orderBy: [desc(media.updatedAt)],
+      columns: {
+        userId: false,
+      },
+    });
+
+    return allMedia;
+  }),
+
+  create: publicProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        size: z.number(),
+        key: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const isAdmin = await CheckIfAdmin();
+
+      if (!isAdmin) throw new Error("Unauthorized");
+
+      const { userId } = await auth();
+
+      const mediaCreated = await db
+        .insert(media)
+        .values({
+          key: input.key,
+          name: input.name,
+          size: input.size,
+          userId: userId,
+        })
+        .returning();
+
+      return {
+        status: true,
+        data: mediaCreated,
+        message: "Media created successfully",
+      };
+    }),
+
+  remove: publicProcedure
+    .input(z.object({ key: z.string() }))
+    .mutation(async ({ input }) => {
+      const isAdmin = await CheckIfAdmin();
+
+      if (!isAdmin) throw new Error("Unauthorized");
+
+      // Delete from the media & document databases
+      const utapi = new UTApi();
+      await utapi.deleteFiles([input.key]);
+
+      await db.delete(media).where(eq(media.key, input.key));
+
+      return {
+        status: true,
+        message: "Media deleted successfully",
+      };
+    }),
+});
