@@ -3,7 +3,6 @@
 
 import { sql } from "drizzle-orm";
 import {
-  boolean,
   index,
   integer,
   pgEnum,
@@ -33,7 +32,6 @@ export const media = createTable(
     size: integer("size"),
     userId: varchar("user_id", { length: 256 }),
     visibility: visibilityEnum,
-    toBeDeleted: boolean("to_be_deleted").default(false),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),

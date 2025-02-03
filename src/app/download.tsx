@@ -1,33 +1,22 @@
 import FadeIn from "@/components/fade-in";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import CheckIfAdmin from "@/lib/check-if-admin";
 import { APP_ID, formatBytes } from "@/lib/utils";
 import { ArrowDownToLine } from "lucide-react";
 import Link from "next/link";
+import DeleteButton from "./delete-button";
 
 export default async function Download({
   fileKey,
   label,
   size,
-  toBeDeleted,
-  visibility,
-  showDeleted,
-  showPrivate,
+  showDlt = false,
 }: {
   fileKey: string;
   label: string;
   size: number;
-  toBeDeleted: boolean;
-  visibility: "public" | "private";
-  showDeleted: string;
-  showPrivate: string;
+  showDlt?: boolean;
 }) {
-  const isAdmin = await CheckIfAdmin();
-
-  if (!isAdmin && showDeleted) return;
-  if (!isAdmin && showPrivate) return;
-
   return (
     <FadeIn>
       <div className="relative flex flex-col gap-4 rounded-md border px-6 py-4 text-left hover:bg-accent md:flex-row md:items-center md:justify-between">
@@ -37,31 +26,20 @@ export default async function Download({
         </div>
 
         {/* Actions */}
-        <Button disabled={toBeDeleted}>
-          <Link
-            href={`https://${APP_ID}.ufs.sh/f/${fileKey}`}
-            download
-            className="flex items-center gap-2"
-          >
-            <ArrowDownToLine />
-            <div className="md:hidden">Download</div>
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          {showDlt && <DeleteButton fileKey={fileKey} />}
 
-        {/* Fixed Badges */}
-        {/* Only show if the user is an admin and has the option to show deleted media */}
-        {isAdmin && showDeleted && toBeDeleted && (
-          <Badge variant={"destructive"} className="absolute -right-3 -top-3">
-            Deleted
-          </Badge>
-        )}
-
-        {/* Only show if the user is an admin and has the option to show private media */}
-        {isAdmin && showPrivate && visibility === "private" && (
-          <Badge variant={"destructive"} className="absolute -left-3 -top-3">
-            Private
-          </Badge>
-        )}
+          <Button>
+            <Link
+              href={`https://${APP_ID}.ufs.sh/f/${fileKey}`}
+              download
+              className="flex items-center gap-2"
+            >
+              <ArrowDownToLine />
+              <div className="md:hidden">Download</div>
+            </Link>
+          </Button>
+        </div>
       </div>
     </FadeIn>
   );

@@ -50,6 +50,13 @@ export default async function NavBar() {
             </Link>
           )}
 
+          {/* Show the my upload files button if the user is an admin */}
+          {isAdmin && (
+            <Link href={"/history"}>
+              <DropdownMenuItem>History</DropdownMenuItem>
+            </Link>
+          )}
+
           {/* Showing the logout button if the user is logged in or the admin */}
           {isLoggedIn && (
             <SignOutButton>

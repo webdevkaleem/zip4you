@@ -9,50 +9,41 @@ import { and, desc, eq } from "drizzle-orm";
 import { UTApi } from "uploadthing/server";
 
 export const mediaRouter = createTRPCRouter({
-  getAll: publicProcedure
+  getAll: publicProcedure.query(async () => {
+    const isAdmin = await CheckIfAdmin();
+
+    const allMedia = await db.query.media.findMany({
+      orderBy: [desc(media.updatedAt)],
+      columns: {
+        userId: false,
+      },
+
+      // If the user is not an admin, only show public media
+      ...(!isAdmin && {
+        where: and(eq(media.visibility, "public")),
+      }),
+    });
+
+    return allMedia;
+  }),
+
+  my: publicProcedure
     .input(
       z.object({
-        showDeleted: z.boolean().optional().default(false),
-        showPrivate: z.boolean().optional().default(false),
+        userId: z.string(),
       }),
     )
     .query(async ({ input }) => {
       const isAdmin = await CheckIfAdmin();
+
+      if (!isAdmin) throw new Error("Unauthorized");
 
       const allMedia = await db.query.media.findMany({
         orderBy: [desc(media.updatedAt)],
         columns: {
           userId: false,
         },
-
-        // If the user is not an admin, only show public & not deleted media
-        ...(!isAdmin && {
-          where: and(
-            eq(media.visibility, "public"),
-            eq(media.toBeDeleted, false),
-          ),
-        }),
-
-        ...(isAdmin &&
-          !input.showDeleted &&
-          !input.showPrivate && {
-            where: and(
-              eq(media.toBeDeleted, false),
-              eq(media.visibility, "public"),
-            ),
-          }),
-
-        ...(isAdmin &&
-          !input.showDeleted &&
-          input.showPrivate && {
-            where: and(eq(media.toBeDeleted, false)),
-          }),
-
-        ...(isAdmin &&
-          !input.showPrivate &&
-          input.showDeleted && {
-            where: and(eq(media.visibility, "public")),
-          }),
+        where: eq(media.userId, input.userId),
       });
 
       return allMedia;
@@ -126,14 +117,11 @@ export const mediaRouter = createTRPCRouter({
 
       if (!isAdmin) throw new Error("Unauthorized");
 
-      // Delete from the media & check it from the document databases
+      // Delete from the media & document databases
       const utapi = new UTApi();
       await utapi.deleteFiles([input.key]);
 
-      await db
-        .update(media)
-        .set({ toBeDeleted: true })
-        .where(eq(media.key, input.key));
+      await db.delete(media).where(eq(media.key, input.key));
 
       return {
         status: true,
