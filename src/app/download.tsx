@@ -38,7 +38,11 @@ export default async function Download({
 
         {/* Actions */}
         <Button disabled={toBeDeleted}>
-          <Link href={`https://${APP_ID}.ufs.sh/f/${fileKey}`} download>
+          <Link
+            href={`https://${APP_ID}.ufs.sh/f/${fileKey}`}
+            download
+            className="flex items-center gap-2"
+          >
             <ArrowDownToLine />
             <div className="md:hidden">Download</div>
           </Link>
