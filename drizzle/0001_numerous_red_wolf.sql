@@ -1,0 +1,1 @@
+ALTER TABLE "zip4youmedia" ADD COLUMN "visibility" text DEFAULT 'private';

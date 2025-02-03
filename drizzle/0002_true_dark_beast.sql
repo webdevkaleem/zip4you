@@ -1,0 +1,1 @@
+ALTER TABLE "zip4youmedia" ADD COLUMN "to_be_deleted" boolean DEFAULT false;

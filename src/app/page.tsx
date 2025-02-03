@@ -3,9 +3,25 @@ import HeroWrapper from "@/components/hero-wrapper";
 import { Separator } from "@/components/ui/separator";
 import { api, HydrateClient } from "@/trpc/server";
 import Download from "./download";
+import NoUploads from "./no-uploads";
+import FilterOptions from "./filter-options";
+import CheckIfAdmin from "@/lib/check-if-admin";
 
-export default async function Home() {
-  const allMedia = await api.media.getAll();
+type ParamsId = Promise<{ showDeleted: string; showPrivate: string }>;
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: ParamsId;
+}) {
+  const { showDeleted, showPrivate } = await searchParams;
+
+  const allMedia = await api.media.getAll({
+    showDeleted: (showDeleted ?? "").length > 0,
+    showPrivate: (showPrivate ?? "").length > 0,
+  });
+
+  const isAdmin = await CheckIfAdmin();
 
   return (
     <HydrateClient>
@@ -18,18 +34,33 @@ export default async function Home() {
           </p>
           <Separator className="mx-auto w-1/2 sm:w-1/3 lg:w-1/5" />
 
+          {/* Render the filter options if the user is an admin */}
+          {isAdmin && (
+            <div className="flex flex-col gap-6 md:mx-auto md:w-2/3">
+              <FilterOptions />
+            </div>
+          )}
+
           <div className="flex flex-col gap-6 md:mx-auto md:w-2/3">
-            {allMedia.map((media) => {
-              if (media.key && media.name && media.size)
-                return (
-                  <Download
-                    fileKey={media.key}
-                    label={media.name}
-                    key={media.id}
-                    size={media.size}
-                  />
-                );
-            })}
+            {allMedia.length > 0 ? (
+              allMedia.map((media) => {
+                if (media.key && media.name && media.size)
+                  return (
+                    <Download
+                      fileKey={media.key}
+                      label={media.name}
+                      key={media.id}
+                      size={media.size}
+                      toBeDeleted={media.toBeDeleted ?? false}
+                      visibility={media.visibility ?? "private"}
+                      showDeleted={showDeleted}
+                      showPrivate={showPrivate}
+                    />
+                  );
+              })
+            ) : (
+              <NoUploads />
+            )}
           </div>
         </HeroWrapper>
       </FadeIn>

@@ -5,6 +5,7 @@ interface MediaType {
   name: string;
   size: number;
   show: boolean;
+  visibility: "public" | "private";
 }
 
 interface MediaActions {
@@ -12,6 +13,7 @@ interface MediaActions {
   setSize: (size: number) => void;
   setKey: (key: string) => void;
   setShow: (show: boolean) => void;
+  setVisibility: (visibility: "public" | "private") => void;
   resetMedia: () => void;
 }
 
@@ -20,6 +22,7 @@ const initialState: MediaType = {
   name: "",
   size: 0,
   show: false,
+  visibility: "private",
 };
 
 export const useMediaStore = create<MediaType & MediaActions>()((set) => ({
@@ -28,5 +31,6 @@ export const useMediaStore = create<MediaType & MediaActions>()((set) => ({
   setSize: (size) => set(() => ({ size })),
   setKey: (key) => set(() => ({ key })),
   setShow: (show) => set(() => ({ show })),
+  setVisibility: (visibility) => set(() => ({ visibility })),
   resetMedia: () => set(() => ({ ...initialState })),
 }));

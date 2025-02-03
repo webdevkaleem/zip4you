@@ -3,8 +3,10 @@
 
 import { sql } from "drizzle-orm";
 import {
+  boolean,
   index,
   integer,
+  pgEnum,
   pgTableCreator,
   timestamp,
   varchar,
@@ -18,6 +20,10 @@ import {
  */
 export const createTable = pgTableCreator((name) => `zip4you${name}`);
 
+// Enums
+const visibilityObj = pgEnum("text", ["public", "private"]);
+const visibilityEnum = visibilityObj("visibility").default("private");
+
 export const media = createTable(
   "media",
   {
@@ -26,6 +32,8 @@ export const media = createTable(
     key: varchar("key", { length: 256 }),
     size: integer("size"),
     userId: varchar("user_id", { length: 256 }),
+    visibility: visibilityEnum,
+    toBeDeleted: boolean("to_be_deleted").default(false),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),

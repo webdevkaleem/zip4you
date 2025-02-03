@@ -5,20 +5,58 @@ import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { db } from "@/server/db";
 import { media } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { UTApi } from "uploadthing/server";
 
 export const mediaRouter = createTRPCRouter({
-  getAll: publicProcedure.query(async () => {
-    const allMedia = await db.query.media.findMany({
-      orderBy: [desc(media.updatedAt)],
-      columns: {
-        userId: false,
-      },
-    });
+  getAll: publicProcedure
+    .input(
+      z.object({
+        showDeleted: z.boolean().optional().default(false),
+        showPrivate: z.boolean().optional().default(false),
+      }),
+    )
+    .query(async ({ input }) => {
+      const isAdmin = await CheckIfAdmin();
 
-    return allMedia;
-  }),
+      const allMedia = await db.query.media.findMany({
+        orderBy: [desc(media.updatedAt)],
+        columns: {
+          userId: false,
+        },
+
+        // If the user is not an admin, only show public & not deleted media
+        ...(!isAdmin && {
+          where: and(
+            eq(media.visibility, "public"),
+            eq(media.toBeDeleted, false),
+          ),
+        }),
+
+        ...(isAdmin &&
+          !input.showDeleted &&
+          !input.showPrivate && {
+            where: and(
+              eq(media.toBeDeleted, false),
+              eq(media.visibility, "public"),
+            ),
+          }),
+
+        ...(isAdmin &&
+          !input.showDeleted &&
+          input.showPrivate && {
+            where: and(eq(media.toBeDeleted, false)),
+          }),
+
+        ...(isAdmin &&
+          !input.showPrivate &&
+          input.showDeleted && {
+            where: and(eq(media.visibility, "public")),
+          }),
+      });
+
+      return allMedia;
+    }),
 
   create: publicProcedure
     .input(
@@ -48,7 +86,36 @@ export const mediaRouter = createTRPCRouter({
       return {
         status: true,
         data: mediaCreated,
-        message: "Media created successfully",
+        message: "Media saved successfully",
+      };
+    }),
+
+  edit: publicProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        size: z.number(),
+        key: z.string(),
+        visibility: z.enum(["public", "private"]),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const isAdmin = await CheckIfAdmin();
+
+      if (!isAdmin) throw new Error("Unauthorized");
+
+      await db
+        .update(media)
+        .set({
+          name: input.name,
+          size: input.size,
+          visibility: input.visibility,
+        })
+        .where(eq(media.key, input.key));
+
+      return {
+        status: true,
+        message: "Media saved successfully",
       };
     }),
 
@@ -59,11 +126,14 @@ export const mediaRouter = createTRPCRouter({
 
       if (!isAdmin) throw new Error("Unauthorized");
 
-      // Delete from the media & document databases
+      // Delete from the media & check it from the document databases
       const utapi = new UTApi();
       await utapi.deleteFiles([input.key]);
 
-      await db.delete(media).where(eq(media.key, input.key));
+      await db
+        .update(media)
+        .set({ toBeDeleted: true })
+        .where(eq(media.key, input.key));
 
       return {
         status: true,
