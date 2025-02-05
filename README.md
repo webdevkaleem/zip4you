@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 > This project is still in progress and not yet complete. Contributions and feedback are welcome!
 
 # Zip4You (File Distributor)
@@ -122,3 +123,6 @@ npm run dev
 ### License
 [MIT](https://choosealicense.com/licenses/mit/)
 
+=======
+# Zip4You
+>>>>>>> d28125e3e15e2e076db59b936b5844c070ee487b
