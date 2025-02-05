@@ -1,10 +1,6 @@
-<<<<<<< HEAD
 > This project is still in progress and not yet complete. Contributions and feedback are welcome!
 
 # Zip4You (File Distributor)
-
-![Backed categories page overview](git_images/backend_categories.png)
-
 
 This is an open-source file distributor designed to facilitate file sharing among users without requiring account creation. It’s a simple solution for distributing files quickly and efficiently.
 
@@ -123,6 +119,3 @@ npm run dev
 ### License
 [MIT](https://choosealicense.com/licenses/mit/)
 
-=======
-# Zip4You
->>>>>>> d28125e3e15e2e076db59b936b5844c070ee487b
