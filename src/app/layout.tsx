@@ -29,14 +29,14 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ClerkProvider>
-      <SpeedInsights />
-      <Analytics />
       <html lang="en" className={`${GeistSans.variable}`}>
         <body
           className={cn("text-lg font-light", {
             "debug-screens": env.NODE_ENV === "development",
           })}
         >
+          <SpeedInsights />
+          <Analytics />
           <NextSSRPlugin
             /**
              * The `extractRouterConfig` will extract **only** the route configs
