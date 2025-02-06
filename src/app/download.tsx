@@ -1,22 +1,26 @@
 import FadeIn from "@/components/fade-in";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { APP_ID, formatBytes } from "@/lib/utils";
-import { ArrowDownToLine } from "lucide-react";
-import Link from "next/link";
+import { formatBytes } from "@/lib/utils";
 import DeleteButton from "./delete-button";
+import DownloadButton from "./download-button";
+import { redis } from "@/server/db/redis";
 
 export default async function Download({
   fileKey,
   label,
   size,
   showDlt = false,
+  mediaId,
 }: {
   fileKey: string;
   label: string;
   size: number;
   showDlt?: boolean;
+  mediaId: number;
 }) {
+  const downloadCount = await redis.get(`media:${mediaId}`);
+  const downloadCountNum = downloadCount ? Number(downloadCount ?? 0) : 0;
+
   return (
     <FadeIn>
       <div className="relative flex flex-col gap-4 rounded-md border px-6 py-4 text-left hover:bg-accent md:flex-row md:items-center md:justify-between">
@@ -28,17 +32,11 @@ export default async function Download({
         {/* Actions */}
         <div className="flex gap-2">
           {showDlt && <DeleteButton fileKey={fileKey} />}
-
-          <Button>
-            <Link
-              href={`https://${APP_ID}.ufs.sh/f/${fileKey}`}
-              download
-              className="flex items-center gap-2"
-            >
-              <ArrowDownToLine />
-              <div className="md:hidden">Download</div>
-            </Link>
-          </Button>
+          <DownloadButton
+            fileKey={fileKey}
+            mediaId={mediaId}
+            downloadCount={downloadCountNum}
+          />
         </div>
       </div>
     </FadeIn>

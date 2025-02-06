@@ -38,6 +38,7 @@ export default async function Page() {
                     key={media.id}
                     size={media.size}
                     showDlt={true}
+                    mediaId={media.id}
                   />
                 );
             })

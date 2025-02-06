@@ -7,6 +7,7 @@ import { useMediaStore } from "@/stores/media";
 import { api } from "@/trpc/react";
 import { createId } from "@paralleldrive/cuid2";
 import JSZip from "jszip";
+import { useEffect } from "react";
 
 export default function Uploader() {
   // Variables
@@ -17,6 +18,11 @@ export default function Uploader() {
 
   // Derived Functions
   const { mutate: create_mutate } = api.media.create.useMutation();
+
+  // Reset the state on mount
+  useEffect(() => {
+    resetMedia();
+  }, [resetMedia]);
 
   // JSX
   return (

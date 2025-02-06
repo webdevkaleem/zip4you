@@ -102,8 +102,8 @@ CLERK_SECRET_KEY=""
 UPLOADTHING_TOKEN=""
 
 # Upstash (Redis)
-KV_REST_API_URL=""
-KV_REST_API_TOKEN=""
+UPSTASH_REDIS_REST_URL=""
+UPSTASH_REDIS_REST_TOKEN=""
 ```
 
 Setting up the database:

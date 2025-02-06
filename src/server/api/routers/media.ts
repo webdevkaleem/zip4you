@@ -7,6 +7,14 @@ import { media } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { and, desc, eq } from "drizzle-orm";
 import { UTApi } from "uploadthing/server";
+import { redis } from "@/server/db/redis";
+import { Ratelimit } from "@upstash/ratelimit";
+import { TRPCError } from "@trpc/server";
+
+const mediaDownloadRatelimit = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(5, "1 m"),
+});
 
 export const mediaRouter = createTRPCRouter({
   getAll: publicProcedure.query(async () => {
@@ -74,6 +82,13 @@ export const mediaRouter = createTRPCRouter({
         })
         .returning();
 
+      if (!mediaCreated[0]) return { status: false, message: "Failed to save" };
+
+      const mediaCreatedId = mediaCreated[0].id;
+
+      // REDIS: Add the file download number in cache
+      await redis.set(`media:${mediaCreatedId}`, 0);
+
       return {
         status: true,
         data: mediaCreated,
@@ -95,19 +110,59 @@ export const mediaRouter = createTRPCRouter({
 
       if (!isAdmin) throw new Error("Unauthorized");
 
-      await db
+      const mediaUpdated = await db
         .update(media)
         .set({
           name: input.name,
           size: input.size,
           visibility: input.visibility,
         })
-        .where(eq(media.key, input.key));
+        .where(eq(media.key, input.key))
+        .returning();
+
+      if (!mediaUpdated[0]) return { status: false, message: "Failed to save" };
+
+      const mediaCreatedId = mediaUpdated[0].id;
+
+      // REDIS: Reset the file download number in cache
+      await redis.set(`media:${mediaCreatedId}`, 0);
 
       return {
         status: true,
         message: "Media saved successfully",
       };
+    }),
+
+  download: publicProcedure
+    .input(z.object({ mediaId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        // REDIS: Rate limit
+        const ip =
+          ctx.headers.get("x-real-ip") ??
+          ctx.headers.get("x-forwarded-for") ??
+          "127.0.0.1";
+
+        const { success } = await mediaDownloadRatelimit.limit(ip);
+
+        if (!success) {
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: "You have exceeded the download limit",
+          });
+        }
+
+        // REDIS: Increment the file download number in cache
+        await redis.incr(`media:${input.mediaId}`);
+
+        return;
+      } catch (error) {
+        return {
+          status: false,
+          message:
+            error instanceof Error ? error.message : "Failed to download",
+        };
+      }
     }),
 
   remove: publicProcedure
@@ -121,7 +176,18 @@ export const mediaRouter = createTRPCRouter({
       const utapi = new UTApi();
       await utapi.deleteFiles([input.key]);
 
-      await db.delete(media).where(eq(media.key, input.key));
+      const mediaDeleted = await db
+        .delete(media)
+        .where(eq(media.key, input.key))
+        .returning();
+
+      if (!mediaDeleted[0])
+        return { status: false, message: "Failed to delete" };
+
+      const mediaDeletedId = mediaDeleted[0].id;
+
+      // Remove the count from the redis cache
+      await redis.del(`media:${mediaDeletedId}`);
 
       return {
         status: true,

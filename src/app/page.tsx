@@ -29,6 +29,7 @@ export default async function Page() {
                       label={media.name}
                       key={media.id}
                       size={media.size}
+                      mediaId={media.id}
                     />
                   );
               })

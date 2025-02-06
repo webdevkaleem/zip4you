@@ -1,13 +1,10 @@
 import FadeIn from "@/components/fade-in";
 import HeroWrapper from "@/components/hero-wrapper";
 import { Button } from "@/components/ui/button";
-import CheckIfLoggedIn from "@/lib/check-if-logged-in";
-import { SignInButton, SignOutButton } from "@clerk/nextjs";
+import { SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 
-export default async function Page() {
-  const isLoggedIn = await CheckIfLoggedIn();
-
+export default function Page() {
   return (
     <FadeIn>
       <HeroWrapper>
@@ -21,19 +18,9 @@ export default async function Page() {
             <Button>Home Page</Button>
           </Link>
 
-          {/* Only show the login feature if the user IS NOT logged in */}
-          {!isLoggedIn && (
-            <Button variant={"outline"} asChild>
-              <SignInButton>Sign Up</SignInButton>
-            </Button>
-          )}
-
-          {/* Showing the logout button if the user IS logged in */}
-          {isLoggedIn && (
-            <Button variant={"outline"} className="text-destructive" asChild>
-              <SignOutButton>Sign Out</SignOutButton>
-            </Button>
-          )}
+          <Button variant={"outline"} asChild>
+            <SignInButton>Sign Up</SignInButton>
+          </Button>
         </div>
       </HeroWrapper>
     </FadeIn>

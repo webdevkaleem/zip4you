@@ -28,7 +28,7 @@ export default async function NavBar() {
       <DropdownMenu>
         <DropdownMenuTrigger>
           <Avatar>
-            <AvatarImage src={userAvatar} />
+            <AvatarImage src={userAvatar ?? "https://github.com/shadcn.png"} />
             <AvatarFallback>{userInitials}</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>

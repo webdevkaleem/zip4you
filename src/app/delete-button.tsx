@@ -19,7 +19,6 @@ export default function DeleteButton({ fileKey }: { fileKey: string }) {
     if (isSuccess) {
       toast({
         title: "Media deleted successfully",
-        variant: "destructive",
       });
 
       router.refresh();
