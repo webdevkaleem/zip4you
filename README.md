@@ -91,7 +91,7 @@ npm install
 
 Create a `.env` file in the root directory and add the following variables:
 ```bash
-# Postgres (Database)
+# Postgres (Main Database)
 DATABASE_URL=""
 
 # Clerk (Authentication)
@@ -100,6 +100,10 @@ CLERK_SECRET_KEY=""
 
 # Uploadthing (File Storage)
 UPLOADTHING_TOKEN=""
+
+# Upstash (Redis)
+KV_REST_API_URL=""
+KV_REST_API_TOKEN=""
 ```
 
 Setting up the database:
