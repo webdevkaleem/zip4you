@@ -58,14 +58,18 @@ export default function DownloadButton({
 
   // If the download is successful and has a true status, increment the count
   useEffect(() => {
-    if (isSuccess && data?.status) {
+    if (isSuccess && data?.status === true) {
       const link = document.createElement("a");
       link.href = `https://${APP_ID}.ufs.sh/f/${fileKey}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      toast({
+        title: data.message,
+      });
     }
-  }, [data?.status, fileKey, isSuccess]);
+  }, [data, fileKey, isSuccess, toast]);
 
   return (
     <Button

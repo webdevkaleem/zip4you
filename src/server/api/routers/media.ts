@@ -155,7 +155,10 @@ export const mediaRouter = createTRPCRouter({
         // REDIS: Increment the file download number in cache
         await redis.incr(`media:${input.mediaId}`);
 
-        return;
+        return {
+          status: true,
+          message: "Download started",
+        };
       } catch (error) {
         return {
           status: false,
