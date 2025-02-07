@@ -20,7 +20,6 @@ export default clerkMiddleware(async (_, req) => {
     req.headers.get("x-real-ip") ??
     req.headers.get("x-forwarded-for") ??
     "127.0.0.1";
-  console.log("IP: ", ip);
 
   const { success } = await ratelimit.limit(ip);
 

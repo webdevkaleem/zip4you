@@ -29,7 +29,6 @@ export default async function Page() {
         <div className="flex flex-col gap-6 md:mx-auto md:w-2/3">
           {allMedia.length > 0 ? (
             allMedia.map((media) => {
-              console.log(media);
               if (media.key && media.name && media.size)
                 return (
                   <Download

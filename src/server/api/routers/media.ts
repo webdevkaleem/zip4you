@@ -181,8 +181,7 @@ export const mediaRouter = createTRPCRouter({
       const allPromisesToDelete = allMedia.map(async (mediaObj) => {
         const mediaDate = new Date(mediaObj.createdAt);
         const mediaOneDayAfter = new Date(
-          // mediaDate.getTime() + 24 * 60 * 60 * 1000,
-          mediaDate.getTime(),
+          mediaDate.getTime() + 24 * 60 * 60 * 1000,
         );
 
         if (mediaOneDayAfter > todaysDate || !mediaObj.key)
@@ -190,8 +189,6 @@ export const mediaRouter = createTRPCRouter({
             status: true,
             message: "No media to delete",
           };
-
-        console.log("Set to clean", mediaObj.name);
 
         // Now delete all the selected media from the database and uploadthing
         await utapi.deleteFiles([mediaObj.key]);
@@ -203,7 +200,6 @@ export const mediaRouter = createTRPCRouter({
         message: "Cleaned successfully",
       };
     } catch (error) {
-      console.log("Hello", error);
       return {
         status: false,
         message:
