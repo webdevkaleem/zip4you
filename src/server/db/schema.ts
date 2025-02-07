@@ -10,6 +10,7 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+import { createSelectSchema } from "drizzle-zod";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -43,3 +44,6 @@ export const media = createTable(
     nameIndex: index("name_idx").on(tableObj.name),
   }),
 );
+
+// Types
+export const mediaSelectSchema = createSelectSchema(media);

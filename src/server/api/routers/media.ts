@@ -3,13 +3,13 @@ import { z } from "zod";
 import CheckIfAdmin from "@/lib/check-if-admin";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { db } from "@/server/db";
+import { redis } from "@/server/db/redis";
 import { media } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
+import { TRPCError } from "@trpc/server";
+import { Ratelimit } from "@upstash/ratelimit";
 import { and, desc, eq } from "drizzle-orm";
 import { UTApi } from "uploadthing/server";
-import { redis } from "@/server/db/redis";
-import { Ratelimit } from "@upstash/ratelimit";
-import { TRPCError } from "@trpc/server";
 
 const mediaDownloadRatelimit = new Ratelimit({
   redis: redis,
@@ -167,6 +167,50 @@ export const mediaRouter = createTRPCRouter({
         };
       }
     }),
+
+  clean: publicProcedure.query(async () => {
+    try {
+      // Check if any media's creation time is older than 1 day.
+      // If so, delete it from both uploadthing and media database.
+      const utapi = new UTApi();
+      const todaysDate = new Date();
+
+      const allMedia = await db.query.media.findMany();
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const allPromisesToDelete = allMedia.map(async (mediaObj) => {
+        const mediaDate = new Date(mediaObj.createdAt);
+        const mediaOneDayAfter = new Date(
+          // mediaDate.getTime() + 24 * 60 * 60 * 1000,
+          mediaDate.getTime(),
+        );
+
+        if (mediaOneDayAfter > todaysDate || !mediaObj.key)
+          return {
+            status: true,
+            message: "No media to delete",
+          };
+
+        console.log("Set to clean", mediaObj.name);
+
+        // Now delete all the selected media from the database and uploadthing
+        await utapi.deleteFiles([mediaObj.key]);
+        await db.delete(media).where(eq(media.id, mediaObj.id));
+      });
+
+      return {
+        status: true,
+        message: "Cleaned successfully",
+      };
+    } catch (error) {
+      console.log("Hello", error);
+      return {
+        status: false,
+        message:
+          error instanceof Error ? error.message : "Something went wrong",
+      };
+    }
+  }),
 
   remove: publicProcedure
     .input(z.object({ key: z.string() }))
