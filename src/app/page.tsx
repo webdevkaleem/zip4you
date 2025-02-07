@@ -30,6 +30,7 @@ export default async function Page() {
                       key={media.id}
                       size={media.size}
                       mediaId={media.id}
+                      startDate={media.createdAt}
                     />
                   );
               })

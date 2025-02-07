@@ -38,6 +38,7 @@ export default async function Page() {
                     size={media.size}
                     showDlt={true}
                     mediaId={media.id}
+                    startDate={media.createdAt}
                   />
                 );
             })
