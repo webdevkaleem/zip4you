@@ -17,6 +17,7 @@ import { ourFileRouter } from "./api/uploadthing/core";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
+import FootBar from "@/components/foot-bar";
 
 export const metadata: Metadata = {
   title: "Zip4You",
@@ -52,6 +53,7 @@ export default function RootLayout({
             <MainLayout className="flex flex-col gap-16">
               <NavBar />
               {children}
+              <FootBar />
             </MainLayout>
           </TRPCReactProvider>
         </body>

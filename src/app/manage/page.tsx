@@ -15,15 +15,15 @@ export default async function Page() {
   if (!userId) redirect("/not-authorized");
   if (!isAdmin) redirect("/not-authorized");
 
-  const allMedia = await api.media.my({
+  const allMedia = await api.media.admin({
     userId,
   });
 
   return (
     <FadeIn>
       <HeroWrapper>
-        <h1>My History</h1>
-        <p>All of your uploads will be listed here</p>
+        <h1>Manage Files</h1>
+        <p>All of the files on the site will be shown here.</p>
         <Separator className="mx-auto w-1/2 sm:w-1/3 lg:w-1/5" />
 
         <div className="flex flex-col gap-6 md:mx-auto md:w-2/3">

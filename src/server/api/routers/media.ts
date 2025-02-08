@@ -38,13 +38,13 @@ export const mediaRouter = createTRPCRouter({
     return allMedia;
   }),
 
-  my: publicProcedure
+  admin: publicProcedure
     .input(
       z.object({
         userId: z.string(),
       }),
     )
-    .query(async ({ input }) => {
+    .query(async () => {
       const isAdmin = await CheckIfAdmin();
 
       if (!isAdmin) throw new Error("Unauthorized");
@@ -54,7 +54,6 @@ export const mediaRouter = createTRPCRouter({
         columns: {
           userId: false,
         },
-        where: eq(media.userId, input.userId),
       });
 
       return allMedia;
@@ -239,9 +238,12 @@ export const mediaRouter = createTRPCRouter({
       // Convert the attachmentsFetch into a buffer
       const attachmentsBuffer = await attachmentsFetch.arrayBuffer();
 
+      // Convert the buffer into sharp buffer
+      const attachmentsSharpBuffer = await sharp(attachmentsBuffer).toBuffer();
+
       // Convert the attachmentsFile to a file
       const attachmentsFile = new UTFile(
-        [attachmentsBuffer],
+        [attachmentsSharpBuffer],
         subjectFormatted,
         {
           type: "application/zip",

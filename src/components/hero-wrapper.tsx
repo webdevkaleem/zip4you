@@ -3,5 +3,7 @@ export default function HeroWrapper({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="flex flex-col gap-6 text-center">{children}</div>;
+  return (
+    <div className="flex flex-col gap-6 pb-12 text-center">{children}</div>
+  );
 }

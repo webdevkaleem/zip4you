@@ -52,8 +52,8 @@ export default async function NavBar() {
 
           {/* Show the my upload files button if the user is an admin */}
           {isAdmin && (
-            <Link href={"/history"}>
-              <DropdownMenuItem>History</DropdownMenuItem>
+            <Link href={"/manage"}>
+              <DropdownMenuItem>Manage</DropdownMenuItem>
             </Link>
           )}
 
