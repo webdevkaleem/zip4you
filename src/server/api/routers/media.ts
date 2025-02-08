@@ -208,10 +208,24 @@ export const mediaRouter = createTRPCRouter({
     }
   }),
 
-  gmail: publicProcedure.mutation(() => {
-    console.log("Running gmail automation tTPC procedure");
-    return;
-  }),
+  gmail: publicProcedure
+    .input(
+      z.object({
+        headers: z.object({
+          authorization: z.string(),
+        }),
+        data: z.object({
+          Subject: z.string(),
+          Attachments: z.string(),
+        }),
+      }),
+    )
+    .mutation(({ ctx, input }) => {
+      console.log("Running gmail automation tTPC procedure");
+      console.log("CTX", ctx);
+      console.log("INPUT", input);
+      return;
+    }),
 
   remove: publicProcedure
     .input(z.object({ key: z.string() }))
