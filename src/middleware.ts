@@ -12,7 +12,7 @@ const redis = new Redis({
 
 const ratelimit = new Ratelimit({
   redis: redis,
-  limiter: Ratelimit.slidingWindow(120, "1 m"),
+  limiter: Ratelimit.slidingWindow(60, "1 m"),
 });
 
 export default clerkMiddleware(async (_, req) => {
