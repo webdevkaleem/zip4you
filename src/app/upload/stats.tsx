@@ -83,8 +83,10 @@ export default function Stats() {
   return (
     <motion.div
       className="flex flex-col gap-2 md:mx-auto md:w-2/3"
-      initial={{ opacity: 0 }}
-      animate={show ? { opacity: 1 } : { opacity: 0 }}
+      initial={{ opacity: 0, height: 0 }}
+      animate={
+        show ? { opacity: 1, height: "auto" } : { opacity: 0, height: 0 }
+      }
     >
       {/* Row */}
       <div className="flex flex-col gap-4 rounded-md border px-6 py-4 text-sm md:flex-row md:justify-between">

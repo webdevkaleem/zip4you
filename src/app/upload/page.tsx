@@ -14,7 +14,7 @@ export default async function Page() {
   return (
     <FadeIn>
       <HeroWrapper>
-        <h1>Upload</h1>
+        <h1>Upload Media</h1>
         <p>
           Anything that you upload here will be converted into a zip file and
           made public for every visitor on the website. Kindly upload at your
