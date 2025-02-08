@@ -219,9 +219,17 @@ export const mediaRouter = createTRPCRouter({
 
       const attachments = ctx.headers.get("attachments");
       const subject = ctx.headers.get("subject");
+      const from_email = ctx.headers.get("from_email");
 
-      if (!attachments || !subject)
+      if (!attachments || !subject || !from_email)
         return new TRPCError({ code: "BAD_REQUEST" });
+
+      // Check if the correct person sen't the mail
+      const allowedEmails = ["muneeb.ict@gmail.com", "webdevkaleem@gmail.com"];
+
+      if (!allowedEmails.includes(from_email)) {
+        return new TRPCError({ code: "FORBIDDEN" });
+      }
 
       const subjectFormatted = slugToLabel(labelToSlug(subject));
 
