@@ -211,18 +211,12 @@ export const mediaRouter = createTRPCRouter({
   gmail: publicProcedure
     .input(
       z.object({
-        headers: z.object({
-          authorization: z.string(),
-        }),
-        data: z.object({
-          Subject: z.string(),
-          Attachments: z.string(),
-        }),
+        data: z.string(),
       }),
     )
     .mutation(({ ctx, input }) => {
       console.log("Running gmail automation tTPC procedure");
-      console.log("CTX", ctx);
+      console.log("CTX headers", ctx.headers);
       console.log("INPUT", input);
       return;
     }),
