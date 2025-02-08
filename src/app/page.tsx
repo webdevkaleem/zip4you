@@ -21,10 +21,7 @@ export default async function Page() {
       <FadeIn>
         <HeroWrapper>
           <h1>Download the most recent zip files</h1>
-          <p>
-            Everything on this site is public. Worry not, everything is deleted
-            automatically after 24 hours. Kindly download at your own risk.
-          </p>
+
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -35,6 +32,12 @@ export default async function Page() {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+
+          <p>
+            Everything on this site is public. Worry not, everything is deleted
+            automatically after 24 hours. Kindly download at your own risk.
+          </p>
+
           <Separator className="mx-auto w-1/2 sm:w-1/3 lg:w-1/5" />
 
           <div className="flex flex-col gap-6 md:mx-auto md:w-2/3">
