@@ -240,7 +240,13 @@ export const mediaRouter = createTRPCRouter({
       const attachmentsBuffer = await attachmentsFetch.arrayBuffer();
 
       // Convert the attachmentsFile to a file
-      const attachmentsFile = new UTFile([attachmentsBuffer], subjectFormatted);
+      const attachmentsFile = new UTFile(
+        [attachmentsBuffer],
+        subjectFormatted,
+        {
+          type: "application/zip",
+        },
+      );
 
       // Now we can create a new media in uploadthing
       const utapi = new UTApi();
