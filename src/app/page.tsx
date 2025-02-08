@@ -6,11 +6,11 @@ import Download from "./download";
 import NoUploads from "./no-uploads";
 
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
 import { Badge } from "@/components/ui/badge";
 
 export default async function Page() {
@@ -22,16 +22,16 @@ export default async function Page() {
         <HeroWrapper>
           <h1>Download the most recent zip files</h1>
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge className="mx-auto w-fit">Important Information</Badge>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>This site is meant for educational purposes only.</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Badge className="mx-auto w-fit">Important Information</Badge>
+            </PopoverTrigger>
+            <PopoverContent asChild>
+              <p className="text-center text-sm">
+                This site is meant for educational purposes only.
+              </p>
+            </PopoverContent>
+          </Popover>
 
           <p>
             Everything on this site is public. Worry not, everything is deleted
