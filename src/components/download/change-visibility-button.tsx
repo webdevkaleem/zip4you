@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ChangeVisibilityButton({
   name,
@@ -26,9 +27,12 @@ export default function ChangeVisibilityButton({
 }) {
   // State management
   const [visibilityState, setVisibilityState] = useState<string>(visibility);
-  const router = useRouter();
 
-  const { mutate, isPending, isSuccess, data } = api.media.edit.useMutation();
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const { mutate, isPending, isSuccess, data, reset } =
+    api.media.edit.useMutation();
 
   // Only run the handleUpdate when the current visibility state is different from the new visibility state
   useEffect(() => {
@@ -45,9 +49,16 @@ export default function ChangeVisibilityButton({
   // On success revalidate the current path
   useEffect(() => {
     if (isSuccess && data.status) {
+      // Toast message
+      toast({
+        title: "Media visibility changed successfully",
+      });
+
+      // Reset the state
+      reset();
       router.refresh();
     }
-  }, [data, isSuccess, router]);
+  }, [data, isSuccess, reset, router, toast]);
 
   return (
     <Select

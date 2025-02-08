@@ -19,7 +19,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { slugToLabel } from "@/lib/utils";
+import { labelToSlug, slugToLabel } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 export default function RenameButton({
   name,
@@ -37,16 +38,24 @@ export default function RenameButton({
   const [model, setModel] = useState<boolean>(false);
 
   const router = useRouter();
+  const { toast } = useToast();
 
   const { mutate, isPending, isSuccess, data, reset } =
     api.media.edit.useMutation();
 
   function handleDiscard() {
+    // Toast message
+    toast({
+      title: "Media discarded successfully",
+    });
+
+    // Reset the state
     reset();
+    setModel(false);
   }
 
   function handleSave() {
-    if (text !== name) {
+    if (labelToSlug(text) !== name) {
       mutate({
         key: fileKey,
         name: text,
@@ -59,11 +68,17 @@ export default function RenameButton({
   // Only run the handleUpdate when the current visibility state is different from the new visibility state
   useEffect(() => {
     if (isSuccess && data.status) {
+      // Toast message
+      toast({
+        title: "Media renamed successfully",
+      });
+
+      // Reset the state
       setModel(false);
       reset();
       router.refresh();
     }
-  }, [data, isSuccess, router, reset]);
+  }, [data, isSuccess, router, reset, toast]);
 
   return (
     <Dialog open={model} onOpenChange={setModel}>

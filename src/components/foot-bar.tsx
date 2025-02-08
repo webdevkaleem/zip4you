@@ -14,7 +14,7 @@ export default function FootBar() {
             className="underline underline-offset-4 transition-all duration-300 hover:underline-offset-8"
             target="_blank"
           >
-            webdevkaleem
+            webdevkaleem@gmail.com
           </Link>
         </span>
       </div>
