@@ -211,7 +211,8 @@ export const mediaRouter = createTRPCRouter({
   gmail: publicProcedure
     .input(
       z.object({
-        data: z.string(),
+        subject: z.string(),
+        attachments: z.string(),
       }),
     )
     .mutation(({ ctx, input }) => {
