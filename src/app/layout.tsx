@@ -33,7 +33,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className={`${GeistSans.variable}`}>
         <body
-          className={cn("text-lg font-light", {
+          className={cn("dark text-lg font-light", {
             "debug-screens": env.NODE_ENV === "development",
           })}
         >

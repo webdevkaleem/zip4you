@@ -78,7 +78,7 @@ export const mediaRouter = createTRPCRouter({
         .insert(media)
         .values({
           key: input.key,
-          name: input.name,
+          name: labelToSlug(input.name),
           size: input.size,
           userId: userId,
         })
@@ -115,7 +115,7 @@ export const mediaRouter = createTRPCRouter({
       const mediaUpdated = await db
         .update(media)
         .set({
-          name: input.name,
+          name: labelToSlug(input.name),
           size: input.size,
           visibility: input.visibility,
         })

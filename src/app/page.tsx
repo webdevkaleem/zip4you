@@ -2,7 +2,7 @@ import FadeIn from "@/components/fade-in";
 import HeroWrapper from "@/components/hero-wrapper";
 import { Separator } from "@/components/ui/separator";
 import { api, HydrateClient } from "@/trpc/server";
-import Download from "./download";
+import Download from "../components/download";
 import NoUploads from "./no-uploads";
 
 import {
@@ -43,7 +43,7 @@ export default async function Page() {
           <div className="flex flex-col gap-6 md:mx-auto md:w-2/3">
             {allMedia.length > 0 ? (
               allMedia.map((media) => {
-                if (media.key && media.name && media.size)
+                if (media.key && media.name && media.size && media.visibility)
                   return (
                     <Download
                       fileKey={media.key}
@@ -52,6 +52,7 @@ export default async function Page() {
                       size={media.size}
                       mediaId={media.id}
                       startDate={media.createdAt}
+                      visibility={media.visibility}
                     />
                   );
               })

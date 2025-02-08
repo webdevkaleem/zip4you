@@ -6,15 +6,25 @@ import { APP_ID } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { ArrowDownToLine } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import DeleteButton from "./delete-button";
+import ChangeVisibilityButton from "./change-visibility-button";
 
 export default function DownloadButton({
   fileKey,
   mediaId,
   downloadCount,
+  showDlt = false,
+  label,
+  size,
+  visibility,
 }: {
   fileKey: string;
   mediaId: number;
   downloadCount: number;
+  showDlt?: boolean;
+  label: string;
+  size: number;
+  visibility: "public" | "private";
 }) {
   // State management
   const [count, setCount] = useState(downloadCount);
@@ -72,14 +82,25 @@ export default function DownloadButton({
   }, [data, fileKey, isSuccess, toast]);
 
   return (
-    <Button
-      className="flex items-center gap-2"
-      onClick={handleDownload}
-      disabled={isPending}
-    >
-      <ArrowDownToLine />
-      <span>{memoCount}</span>
-      <div className="md:hidden">Downloads</div>
-    </Button>
+    <div className="flex w-full flex-col items-center gap-2 sm:flex-row">
+      {showDlt && (
+        <ChangeVisibilityButton
+          name={label}
+          fileKey={fileKey}
+          size={size}
+          visibility={visibility}
+        />
+      )}
+      {showDlt && <DeleteButton fileKey={fileKey} />}
+      <Button
+        className="flex w-full items-center gap-2 sm:w-fit"
+        onClick={handleDownload}
+        disabled={isPending}
+      >
+        <ArrowDownToLine />
+        <span>{memoCount}</span>
+        <div className="md:hidden">Downloads</div>
+      </Button>
+    </div>
   );
 }

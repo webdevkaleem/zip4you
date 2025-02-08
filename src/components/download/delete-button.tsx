@@ -28,7 +28,7 @@ export default function DeleteButton({ fileKey }: { fileKey: string }) {
   return (
     <Button
       variant={"destructive"}
-      className="flex items-center gap-2"
+      className="flex w-full items-center gap-2 sm:w-fit"
       onClick={() => {
         mutate({
           key: fileKey,
