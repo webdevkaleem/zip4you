@@ -14,6 +14,7 @@ import {
 import UserAvatar from "@/lib/check-user-avatar";
 import UserInitials from "@/lib/check-user-initials";
 import Link from "next/link";
+import ThemeSwitch from "./theme-switcher";
 
 export default async function NavBar() {
   const isAdmin = await CheckIfAdmin();
@@ -65,6 +66,9 @@ export default async function NavBar() {
               </DropdownMenuItem>
             </SignOutButton>
           )}
+
+          <DropdownMenuSeparator />
+          <ThemeSwitch />
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

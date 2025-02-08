@@ -18,6 +18,7 @@ import { ourFileRouter } from "./api/uploadthing/core";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import FootBar from "@/components/foot-bar";
+import OnMountTheme from "@/components/on-mount-theme";
 
 export const metadata: Metadata = {
   title: "Zip4You",
@@ -33,10 +34,11 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className={`${GeistSans.variable}`}>
         <body
-          className={cn("dark text-lg font-light", {
+          className={cn("text-lg font-light", {
             "debug-screens": env.NODE_ENV === "development",
           })}
         >
+          <OnMountTheme />
           <SpeedInsights />
           <Analytics />
           <NextSSRPlugin

@@ -108,7 +108,7 @@ export default function RenameButton({
             />
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="gap-2 sm:gap-0">
           <DialogClose asChild>
             <Button
               type="button"

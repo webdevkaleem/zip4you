@@ -68,6 +68,9 @@
 
   html {
     font-size: 75%; /* This makes 1rem = 12px on medium screens */
+    transition:
+      background-color 0.5s ease,
+      color 0.5s ease; /* This makes the transition happen when changing theme */
   }
 
   @screen sm {
