@@ -9,7 +9,10 @@ import { auth } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { Ratelimit } from "@upstash/ratelimit";
 import { and, desc, eq } from "drizzle-orm";
-import { UTApi } from "uploadthing/server";
+import { UTApi, UTFile } from "uploadthing/server";
+import { env } from "@/env";
+import sharp from "sharp";
+import { labelToSlug, slugToLabel } from "@/lib/utils";
 
 const mediaDownloadRatelimit = new Ratelimit({
   redis: redis,
@@ -208,11 +211,57 @@ export const mediaRouter = createTRPCRouter({
     }
   }),
 
-  gmail: publicProcedure.query(({ ctx, input }) => {
-    console.log("Running gmail automation tTPC procedure");
-    console.log("CTX headers", ctx.headers);
-    console.log("INPUT", input);
-    return;
+  gmail: publicProcedure.query(async ({ ctx }) => {
+    try {
+      const isAdmin =
+        env.ZAPIER_ADMIN_TOKEN === ctx.headers.get("zapier-admin-token");
+      if (!isAdmin) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+      const attachments = ctx.headers.get("attachments");
+      const subject = ctx.headers.get("subject");
+
+      if (!attachments || !subject)
+        return new TRPCError({ code: "BAD_REQUEST" });
+
+      const subjectFormatted = slugToLabel(labelToSlug(subject));
+
+      // Fetch the attachments
+      const attachmentsFetch = await fetch(attachments);
+
+      // Convert the attachmentsFetch into a buffer
+      const attachmentsBuffer = await attachmentsFetch.arrayBuffer();
+
+      // Convert the attachmentsFile to a file
+      const attachmentsFile = new UTFile([attachmentsBuffer], subjectFormatted);
+
+      // Now we can create a new media in uploadthing
+      const utapi = new UTApi();
+
+      const returnedUploadedFiles = await utapi.uploadFiles([attachmentsFile]);
+
+      if (!returnedUploadedFiles[0]?.data)
+        return new TRPCError({ code: "BAD_REQUEST" });
+
+      // Saving in the document database
+      await db.insert(media).values({
+        key: returnedUploadedFiles[0].data.key,
+        name: returnedUploadedFiles[0].data.name,
+        size: returnedUploadedFiles[0].data.size,
+        visibility: "public",
+        userId: "zapier",
+      });
+
+      return {
+        status: true,
+        message: "Media saved successfully",
+      };
+    } catch (error) {
+      return {
+        status: false,
+        message:
+          error instanceof Error ? error.message : "Something went wrong",
+      };
+    }
   }),
 
   remove: publicProcedure
