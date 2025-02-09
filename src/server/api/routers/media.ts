@@ -19,6 +19,11 @@ const mediaDownloadRatelimit = new Ratelimit({
   limiter: Ratelimit.slidingWindow(5, "1 m"),
 });
 
+const mediaCleanRatelimit = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(2, "10 m"),
+});
+
 export const mediaRouter = createTRPCRouter({
   getAll: publicProcedure.query(async () => {
     const isAdmin = await CheckIfAdmin();
@@ -170,8 +175,23 @@ export const mediaRouter = createTRPCRouter({
       }
     }),
 
-  clean: publicProcedure.query(async () => {
+  clean: publicProcedure.query(async ({ ctx }) => {
     try {
+      // REDIS: Rate limit
+      const ip =
+        ctx.headers.get("x-real-ip") ??
+        ctx.headers.get("x-forwarded-for") ??
+        "127.0.0.1";
+
+      const { success } = await mediaCleanRatelimit.limit(ip);
+
+      if (!success) {
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: "You have exceeded the cleaning limit",
+        });
+      }
+
       // Check if any media's creation time is older than 1 day.
       // If so, delete it from both uploadthing and media database.
       const utapi = new UTApi();

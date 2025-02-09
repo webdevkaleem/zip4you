@@ -24,7 +24,62 @@ export default async function NavBar() {
 
   return (
     <div className="flex w-full items-center justify-between">
-      <Link href={"/"}>Zip4You</Link>
+      <Link href={"/"} className="flex items-center gap-4">
+        <svg
+          width="48"
+          height="48"
+          viewBox="0 0 199 307"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M2 277.676V208.624C69.9011 247.753 160.244 224.928 196.928 208.624V277.676C110.038 327.163 30.7716 298.295 2 277.676Z"
+            className="stroke-foreground"
+            strokeWidth="4"
+          />
+          <path
+            d="M17.8244 233.759V271.881"
+            className="stroke-foreground"
+            strokeWidth="4"
+          />
+          <path
+            d="M26.4559 238.149V276.271"
+            className="stroke-foreground"
+            strokeWidth="4"
+          />
+          <path
+            d="M2 190.676V121.624C69.9011 160.753 160.244 137.928 196.928 121.624V190.676C110.038 240.163 30.7716 211.296 2 190.676Z"
+            className="stroke-foreground"
+            strokeWidth="4"
+          />
+          <path
+            d="M17.8244 146.759V184.882"
+            className="stroke-foreground"
+            strokeWidth="4"
+          />
+          <path
+            d="M26.4559 154.711V192.834"
+            className="stroke-foreground"
+            strokeWidth="4"
+          />
+          <path
+            d="M26.4559 69.8349V107.957"
+            className="stroke-foreground"
+            strokeWidth="4"
+          />
+          <path
+            d="M2 34.4081V103.46C30.7716 124.08 110.038 152.947 196.928 103.46V34.4081M2 34.4081C69.9011 73.5375 160.244 50.712 196.928 34.4081M2 34.4081C33.4091 9.95218 116.367 -24.2861 196.928 34.4081"
+            className="stroke-foreground"
+            strokeWidth="4"
+          />
+          <path
+            d="M17.8244 59.5433V97.6657"
+            className="stroke-foreground"
+            strokeWidth="4"
+          />
+        </svg>
+        <span className="tracking-widest">Zip4You</span>
+      </Link>
 
       <DropdownMenu>
         <DropdownMenuTrigger>

@@ -15,16 +15,16 @@ import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "./api/uploadthing/core";
 
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/react";
 import FootBar from "@/components/foot-bar";
-import OnMountTheme from "@/components/on-mount-theme";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { ThemeProvider } from "./theme-provider";
 
 export const metadata: Metadata = {
   title: "Zip4You",
   description:
     "This is an open-source file distributor designed to facilitate file sharing among users without requiring account creation. It’s a simple solution for distributing files quickly and efficiently. ",
-  icons: [{ rel: "icon", url: "/favicon.png" }],
+  icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
 export default function RootLayout({
@@ -32,32 +32,43 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${GeistSans.variable}`}>
+      <html
+        lang="en"
+        className={`${GeistSans.variable}`}
+        // To prevent the flickering of the content while the theme is changing upon page load.
+        suppressHydrationWarning
+      >
         <body
           className={cn("text-lg font-light", {
             "debug-screens": env.NODE_ENV === "development",
           })}
         >
-          <OnMountTheme />
-          <SpeedInsights />
-          <Analytics />
-          <NextSSRPlugin
-            /**
-             * The `extractRouterConfig` will extract **only** the route configs
-             * from the router to prevent additional information from being
-             * leaked to the client. The data passed to the client is the same
-             * as if you were to fetch `/api/uploadthing` directly.
-             */
-            routerConfig={extractRouterConfig(ourFileRouter)}
-          />
-          <TRPCReactProvider>
-            <Toaster />
-            <MainLayout className="flex flex-col gap-16">
-              <NavBar />
-              {children}
-              <FootBar />
-            </MainLayout>
-          </TRPCReactProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <SpeedInsights />
+            <Analytics />
+            <NextSSRPlugin
+              /**
+               * The `extractRouterConfig` will extract **only** the route configs
+               * from the router to prevent additional information from being
+               * leaked to the client. The data passed to the client is the same
+               * as if you were to fetch `/api/uploadthing` directly.
+               */
+              routerConfig={extractRouterConfig(ourFileRouter)}
+            />
+            <TRPCReactProvider>
+              <Toaster />
+              <MainLayout className="flex flex-col gap-16">
+                <NavBar />
+                {children}
+                <FootBar />
+              </MainLayout>
+            </TRPCReactProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
