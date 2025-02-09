@@ -17,11 +17,13 @@ import { labelToSlug, slugToLabel } from "@/lib/utils";
 const mediaDownloadRatelimit = new Ratelimit({
   redis: redis,
   limiter: Ratelimit.slidingWindow(5, "1 m"),
+  prefix: "media_download_limit",
 });
 
 const mediaCleanRatelimit = new Ratelimit({
   redis: redis,
   limiter: Ratelimit.slidingWindow(2, "10 m"),
+  prefix: "media_clean_limit",
 });
 
 export const mediaRouter = createTRPCRouter({
