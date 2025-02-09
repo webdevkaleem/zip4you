@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   title: "Zip4You",
   description:
     "This is an open-source file distributor designed to facilitate file sharing among users without requiring account creation. It's a simple solution for distributing files quickly and efficiently. ",
-  icons: [{ rel: "icon", url: "/logo.svg" }],
+  icons: [{ rel: "icon", url: "/logo.png" }],
 };
 
 export default function RootLayout({
