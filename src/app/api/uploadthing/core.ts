@@ -10,7 +10,7 @@ export const ourFileRouter = {
   // Define as many FileRoutes as you like, each with a unique routeSlug
   multiFileUploader: f({
     blob: {
-      maxFileSize: "128MB",
+      maxFileSize: "4GB",
       maxFileCount: 24,
       minFileCount: 1,
     },
