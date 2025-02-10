@@ -208,11 +208,19 @@ export const mediaRouter = createTRPCRouter({
           mediaDate.getTime() + 24 * 60 * 60 * 1000,
         );
 
-        if (mediaOneDayAfter > todaysDate || !mediaObj.key)
+        if (mediaOneDayAfter > todaysDate) {
           return {
             status: true,
             message: "No media to delete",
           };
+        };
+
+        if (!mediaObj.key) {
+          return {
+            status: true,
+            message: "No media to delete",
+          };
+        };
 
         // Now delete all the selected media from the database and uploadthing
         await utapi.deleteFiles([mediaObj.key]);
