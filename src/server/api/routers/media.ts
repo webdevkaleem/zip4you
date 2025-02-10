@@ -205,7 +205,7 @@ export const mediaRouter = createTRPCRouter({
       const allPromisesToDelete = allMedia.map(async (mediaObj) => {
         const mediaDate = new Date(mediaObj.createdAt);
         const mediaOneDayAfter = new Date(
-          mediaDate.getTime() + 24 * 60 * 60 * 1000,
+          mediaDate.getTime(),
         );
 
         if (mediaOneDayAfter > todaysDate) {
