@@ -22,7 +22,7 @@ const mediaDownloadRatelimit = new Ratelimit({
 
 const mediaCleanRatelimit = new Ratelimit({
   redis: redis,
-  limiter: Ratelimit.slidingWindow(20, "1 m"),
+  limiter: Ratelimit.slidingWindow(2, "10 m"),
   prefix: "media_clean_limit",
 });
 
@@ -203,7 +203,9 @@ export const mediaRouter = createTRPCRouter({
 
       const allPromisesToDelete = allMedia.map(async (mediaObj) => {
         const mediaDate = new Date(mediaObj.createdAt);
-        const mediaOneDayAfter = new Date(mediaDate.getTime());
+        const mediaOneDayAfter = new Date(
+          mediaDate.getTime() + 24 * 60 * 60 * 1000,
+        );
 
         if (mediaOneDayAfter > todaysDate) {
           return {
@@ -212,8 +214,6 @@ export const mediaRouter = createTRPCRouter({
           };
         }
 
-        console.log("Date check successful");
-
         if (!mediaObj.key) {
           return {
             status: true,
@@ -221,19 +221,13 @@ export const mediaRouter = createTRPCRouter({
           };
         }
 
-        console.log("Key check successful");
-
-        console.log("Media ID: ", mediaObj.id);
-        console.log("Media Key: ", mediaObj.key);
-
         // Now delete all the selected media from the database and uploadthing
+        // The 'await' keyword is required as then the Promise.All doesn't wait for the promises to resolve
         return [
           await utapi.deleteFiles([mediaObj.key]),
           await db.delete(media).where(eq(media.id, mediaObj.id)),
         ];
       });
-
-      console.log("All promises to delete", allPromisesToDelete.length);
 
       if (allPromisesToDelete.length === 0) {
         return {
@@ -243,8 +237,6 @@ export const mediaRouter = createTRPCRouter({
       }
 
       await Promise.all(allPromisesToDelete);
-
-      console.log("All promises to delete resolved");
 
       return {
         status: true,
