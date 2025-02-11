@@ -22,7 +22,7 @@ const mediaDownloadRatelimit = new Ratelimit({
 
 const mediaCleanRatelimit = new Ratelimit({
   redis: redis,
-  limiter: Ratelimit.slidingWindow(20, "10 m"),
+  limiter: Ratelimit.slidingWindow(20, "1 m"),
   prefix: "media_clean_limit",
 });
 
@@ -213,6 +213,8 @@ export const mediaRouter = createTRPCRouter({
           };
         }
 
+        console.log("Date check successful");
+
         if (!mediaObj.key) {
           return {
             status: true,
@@ -220,10 +222,21 @@ export const mediaRouter = createTRPCRouter({
           };
         }
 
+        console.log("Key check successful");
+
         // Now delete all the selected media from the database and uploadthing
         await utapi.deleteFiles([mediaObj.key]);
         await db.delete(media).where(eq(media.id, mediaObj.id));
+
+        console.log("Deleted media");
       });
+
+      if (allPromisesToDelete.length === 0) {
+        return {
+          status: true,
+          message: "No media to delete",
+        };
+      }
 
       return {
         status: true,
