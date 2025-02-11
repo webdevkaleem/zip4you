@@ -79,6 +79,8 @@ export const mediaRouter = createTRPCRouter({
 
       if (!isAdmin) throw new Error("Unauthorized");
 
+      const utapi = new UTApi();
+
       const { userId } = await auth();
 
       const mediaCreated = await db
@@ -91,7 +93,15 @@ export const mediaRouter = createTRPCRouter({
         })
         .returning();
 
+      const uploadthingMediaUpdated = await utapi.renameFiles({
+        fileKey: input.key,
+        newName: slugToLabel(labelToSlug(input.name)),
+      });
+
       if (!mediaCreated[0]) return { status: false, message: "Failed to save" };
+
+      if (!uploadthingMediaUpdated.success)
+        return { status: false, message: "Failed to save on uploadthing" };
 
       const mediaCreatedId = mediaCreated[0].id;
 
@@ -119,6 +129,8 @@ export const mediaRouter = createTRPCRouter({
 
       if (!isAdmin) throw new Error("Unauthorized");
 
+      const utapi = new UTApi();
+
       const mediaUpdated = await db
         .update(media)
         .set({
@@ -129,7 +141,15 @@ export const mediaRouter = createTRPCRouter({
         .where(eq(media.key, input.key))
         .returning();
 
+      const uploadthingMediaUpdated = await utapi.renameFiles({
+        fileKey: input.key,
+        newName: slugToLabel(labelToSlug(input.name)),
+      });
+
       if (!mediaUpdated[0]) return { status: false, message: "Failed to save" };
+
+      if (!uploadthingMediaUpdated.success)
+        return { status: false, message: "Failed to save on uploadthing" };
 
       const mediaCreatedId = mediaUpdated[0].id;
 
