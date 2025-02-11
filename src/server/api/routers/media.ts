@@ -230,6 +230,8 @@ export const mediaRouter = createTRPCRouter({
         ];
       });
 
+      console.log("All promises to delete", allPromisesToDelete);
+
       if (allPromisesToDelete.length === 0) {
         return {
           status: true,
@@ -238,6 +240,8 @@ export const mediaRouter = createTRPCRouter({
       }
 
       await Promise.all(allPromisesToDelete);
+
+      console.log("All promises to delete resolved");
 
       return {
         status: true,
