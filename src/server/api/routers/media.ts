@@ -223,14 +223,17 @@ export const mediaRouter = createTRPCRouter({
 
         console.log("Key check successful");
 
+        console.log("Media ID: ", mediaObj.id);
+        console.log("Media Key: ", mediaObj.key);
+
         // Now delete all the selected media from the database and uploadthing
         return [
-          utapi.deleteFiles([mediaObj.key]),
-          db.delete(media).where(eq(media.id, mediaObj.id)),
+          await utapi.deleteFiles([mediaObj.key]),
+          await db.delete(media).where(eq(media.id, mediaObj.id)),
         ];
       });
 
-      console.log("All promises to delete", allPromisesToDelete);
+      console.log("All promises to delete", allPromisesToDelete.length);
 
       if (allPromisesToDelete.length === 0) {
         return {
