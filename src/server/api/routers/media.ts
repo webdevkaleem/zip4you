@@ -201,7 +201,6 @@ export const mediaRouter = createTRPCRouter({
 
       const allMedia = await db.query.media.findMany();
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const allPromisesToDelete = allMedia.map(async (mediaObj) => {
         const mediaDate = new Date(mediaObj.createdAt);
         const mediaOneDayAfter = new Date(mediaDate.getTime());
@@ -225,10 +224,10 @@ export const mediaRouter = createTRPCRouter({
         console.log("Key check successful");
 
         // Now delete all the selected media from the database and uploadthing
-        await utapi.deleteFiles([mediaObj.key]);
-        await db.delete(media).where(eq(media.id, mediaObj.id));
-
-        console.log("Deleted media");
+        return [
+          utapi.deleteFiles([mediaObj.key]),
+          db.delete(media).where(eq(media.id, mediaObj.id)),
+        ];
       });
 
       if (allPromisesToDelete.length === 0) {
@@ -238,9 +237,11 @@ export const mediaRouter = createTRPCRouter({
         };
       }
 
+      await Promise.all(allPromisesToDelete);
+
       return {
         status: true,
-        message: "Cleaned successfully",
+        message: `Cleaned ${allMedia.length} media successfully`,
       };
     } catch (error) {
       return {
