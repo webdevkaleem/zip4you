@@ -84,7 +84,7 @@ export default function RenameButton({
     <Dialog open={model} onOpenChange={setModel}>
       <DialogTrigger asChild disabled={isPending}>
         <div className="flex cursor-pointer items-center gap-4">
-          <p className="truncate lg:max-w-64">{name}</p>
+          <p className="truncate lg:max-w-64">{slugToLabel(name)}</p>
           <Edit className="w-4" />
         </div>
       </DialogTrigger>
