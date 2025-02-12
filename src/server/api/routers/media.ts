@@ -306,12 +306,9 @@ export const mediaRouter = createTRPCRouter({
       // Convert the attachmentsFetch into a buffer
       const attachmentsBuffer = await attachmentsFetch.arrayBuffer();
 
-      // Convert the buffer into sharp buffer
-      const attachmentsSharpBuffer = await sharp(attachmentsBuffer).toBuffer();
-
       // Convert the attachmentsFile to a file
       const attachmentsFile = new UTFile(
-        [attachmentsSharpBuffer],
+        [attachmentsBuffer],
         subjectFormatted,
         {
           type: "application/zip",
