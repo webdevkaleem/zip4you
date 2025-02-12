@@ -277,6 +277,8 @@ export const mediaRouter = createTRPCRouter({
         env.ZAPIER_ADMIN_TOKEN === ctx.headers.get("zapier-admin-token");
       if (!isAdmin) throw new TRPCError({ code: "UNAUTHORIZED" });
 
+      console.log("Admin check");
+
       const attachments = ctx.headers.get("attachments");
       const subject = ctx.headers.get("subject");
       const from_email = ctx.headers.get("from_email");
@@ -284,12 +286,16 @@ export const mediaRouter = createTRPCRouter({
       if (!attachments || !subject || !from_email)
         return new TRPCError({ code: "BAD_REQUEST" });
 
+      console.log("Attchments&Subject&From Check");
+
       // Check if the correct person sen't the mail
       const allowedEmails = ["muneeb.ict@gmail.com", "webdevkaleem@gmail.com"];
 
       if (!allowedEmails.includes(from_email)) {
         return new TRPCError({ code: "FORBIDDEN" });
       }
+
+      console.log("Correct allowed email");
 
       const subjectFormatted = slugToLabel(labelToSlug(subject));
 
@@ -319,6 +325,8 @@ export const mediaRouter = createTRPCRouter({
       if (!returnedUploadedFiles[0]?.data)
         return new TRPCError({ code: "BAD_REQUEST" });
 
+      console.log("Uploadthing check");
+
       // Saving in the document database
       await db.insert(media).values({
         key: returnedUploadedFiles[0].data.key,
@@ -328,11 +336,15 @@ export const mediaRouter = createTRPCRouter({
         userId: "zapier",
       });
 
+      console.log("Database check");
+
       return {
         status: true,
         message: "Media saved successfully",
       };
     } catch (error) {
+      console.log("Media.gmail error: ", error);
+
       return {
         status: false,
         message:
