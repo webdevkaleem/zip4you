@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { formatBytes } from "@/lib/utils";
+import { formatBytes, labelToSlug } from "@/lib/utils";
 import { useMediaStore } from "@/stores/media";
 import { api } from "@/trpc/react";
 import { Loader2, Send, Trash2 } from "lucide-react";
@@ -65,7 +65,7 @@ export default function Stats() {
   }
 
   function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setName(e.target.value.trim());
+    setName(labelToSlug(e.target.value.trim()));
   }
 
   // If saving is successful, show a toast, reset the state and redirect to the home page

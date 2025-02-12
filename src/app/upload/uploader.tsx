@@ -42,17 +42,19 @@ export default function Uploader() {
         });
 
         const zipContent = await zip.generateAsync({ type: "blob" });
-        const zipName = `${createId()}`;
+        const zipName = `test:${createId()}`;
 
         // Create a File object from the blob and wrap it in an array
-        const zipFile = new File([zipContent], zipName, {
+        const zipFile = new File([zipContent], `${zipName}.zip`, {
           type: "application/zip",
         });
 
-        setName(zipName);
+        // Set the state
         setSize(zipContent.size);
+        setName(zipName);
 
-        return [zipFile]; // return an array of File objects
+        // Return an array of File objects
+        return [zipFile];
       }}
       onClientUploadComplete={(res) => {
         if (!res[0]) return;

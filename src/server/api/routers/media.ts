@@ -1,6 +1,8 @@
 import { z } from "zod";
 
+import { env } from "@/env";
 import CheckIfAdmin from "@/lib/check-if-admin";
+import { labelToSlug, slugToLabel } from "@/lib/utils";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { db } from "@/server/db";
 import { redis } from "@/server/db/redis";
@@ -10,9 +12,6 @@ import { TRPCError } from "@trpc/server";
 import { Ratelimit } from "@upstash/ratelimit";
 import { and, desc, eq } from "drizzle-orm";
 import { UTApi, UTFile } from "uploadthing/server";
-import { env } from "@/env";
-import sharp from "sharp";
-import { labelToSlug, slugToLabel } from "@/lib/utils";
 
 const mediaDownloadRatelimit = new Ratelimit({
   redis: redis,
@@ -95,7 +94,7 @@ export const mediaRouter = createTRPCRouter({
 
       const uploadthingMediaUpdated = await utapi.renameFiles({
         fileKey: input.key,
-        newName: slugToLabel(labelToSlug(input.name)),
+        newName: `${slugToLabel(labelToSlug(input.name))}.zip`,
       });
 
       if (!mediaCreated[0]) return { status: false, message: "Failed to save" };
@@ -134,7 +133,7 @@ export const mediaRouter = createTRPCRouter({
       const mediaUpdated = await db
         .update(media)
         .set({
-          name: labelToSlug(input.name),
+          name: slugToLabel(labelToSlug(input.name)),
           size: input.size,
           visibility: input.visibility,
         })
@@ -143,7 +142,7 @@ export const mediaRouter = createTRPCRouter({
 
       const uploadthingMediaUpdated = await utapi.renameFiles({
         fileKey: input.key,
-        newName: slugToLabel(labelToSlug(input.name)),
+        newName: `${slugToLabel(labelToSlug(input.name))}.zip`,
       });
 
       if (!mediaUpdated[0]) return { status: false, message: "Failed to save" };
@@ -277,8 +276,6 @@ export const mediaRouter = createTRPCRouter({
         env.ZAPIER_ADMIN_TOKEN === ctx.headers.get("zapier-admin-token");
       if (!isAdmin) throw new TRPCError({ code: "UNAUTHORIZED" });
 
-      console.log("Admin check");
-
       const attachments = ctx.headers.get("attachments");
       const subject = ctx.headers.get("subject");
       const from_email = ctx.headers.get("from_email");
@@ -286,17 +283,12 @@ export const mediaRouter = createTRPCRouter({
       if (!attachments || !subject || !from_email)
         return new TRPCError({ code: "BAD_REQUEST" });
 
-      console.log("Attchments&Subject&From Check");
-
       // Check if the correct person sen't the mail
       const allowedEmails = ["muneeb.ict@gmail.com", "webdevkaleem@gmail.com"];
 
       if (!allowedEmails.includes(from_email)) {
         return new TRPCError({ code: "FORBIDDEN" });
       }
-
-      console.log("Correct allowed email");
-      console.log("Data: ", attachments, subject, from_email);
 
       const subjectFormatted = slugToLabel(labelToSlug(subject));
 
@@ -309,7 +301,7 @@ export const mediaRouter = createTRPCRouter({
       // Convert the attachmentsFile to a file
       const attachmentsFile = new UTFile(
         [attachmentsBuffer],
-        subjectFormatted,
+        `${subjectFormatted}.zip`,
         {
           type: "application/zip",
         },
@@ -323,8 +315,6 @@ export const mediaRouter = createTRPCRouter({
       if (!returnedUploadedFiles[0]?.data)
         return new TRPCError({ code: "BAD_REQUEST" });
 
-      console.log("Uploadthing check");
-
       // Saving in the document database
       await db.insert(media).values({
         key: returnedUploadedFiles[0].data.key,
@@ -334,15 +324,11 @@ export const mediaRouter = createTRPCRouter({
         userId: "zapier",
       });
 
-      console.log("Database check");
-
       return {
         status: true,
         message: "Media saved successfully",
       };
     } catch (error) {
-      console.log("Media.gmail error: ", error);
-
       return {
         status: false,
         message:
