@@ -296,6 +296,7 @@ export const mediaRouter = createTRPCRouter({
       }
 
       console.log("Correct allowed email");
+      console.log("Data: ", attachments, subject, from_email);
 
       const subjectFormatted = slugToLabel(labelToSlug(subject));
 
