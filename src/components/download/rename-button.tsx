@@ -102,7 +102,7 @@ export default function RenameButton({
             </Label>
             <Input
               id="link"
-              value={text}
+              value={slugToLabel(name)}
               onChange={(e) => setText(e.target.value)}
               disabled={isPending}
             />

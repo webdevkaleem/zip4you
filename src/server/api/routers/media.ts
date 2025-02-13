@@ -318,7 +318,9 @@ export const mediaRouter = createTRPCRouter({
       // Saving in the document database
       await db.insert(media).values({
         key: returnedUploadedFiles[0].data.key,
-        name: returnedUploadedFiles[0].data.name,
+
+        // The name / subject is taken from the request body and formatted (without the .zip extension)
+        name: subjectFormatted,
         size: returnedUploadedFiles[0].data.size,
         visibility: "public",
         userId: "zapier",
