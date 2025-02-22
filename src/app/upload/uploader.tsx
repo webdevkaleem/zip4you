@@ -42,7 +42,7 @@ export default function Uploader() {
         });
 
         const zipContent = await zip.generateAsync({ type: "blob" });
-        const zipName = `test:${createId()}`;
+        const zipName = `${createId()}`;
 
         // Create a File object from the blob and wrap it in an array
         const zipFile = new File([zipContent], `${zipName}.zip`, {

@@ -155,6 +155,8 @@ export const mediaRouter = createTRPCRouter({
       // REDIS: Reset the file download number in cache
       await redis.set(`media:${mediaCreatedId}`, 0);
 
+      console.log("updated media name: ", mediaUpdated[0].name);
+
       return {
         status: true,
         message: "Media saved successfully",

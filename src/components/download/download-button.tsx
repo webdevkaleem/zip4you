@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { APP_ID } from "@/lib/utils";
 import { api } from "@/trpc/react";
-import { ArrowDownToLine } from "lucide-react";
+import { ArrowDownToLine, Copy } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import DeleteButton from "./delete-button";
 import ChangeVisibilityButton from "./change-visibility-button";
@@ -91,6 +91,23 @@ export default function DownloadButton({
           visibility={visibility}
         />
       )}
+      <Button
+        className="flex w-full items-center gap-2 sm:w-fit"
+        variant={"outline"}
+        onClick={async () => {
+          await navigator.clipboard.writeText(
+            `https://${APP_ID}.ufs.sh/f/${fileKey}`,
+          );
+
+          toast({
+            title: "Copied to clipboard",
+          });
+        }}
+      >
+        <Copy />
+        <div className="md:hidden">Copy</div>
+      </Button>
+
       {showDlt && <DeleteButton fileKey={fileKey} />}
       <Button
         className="flex w-full items-center gap-2 sm:w-fit"
