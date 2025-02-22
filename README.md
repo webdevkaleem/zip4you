@@ -1,8 +1,6 @@
-> This project is still in progress and not yet complete. Contributions and feedback are welcome!
-
 # Zip4You (File Distributor)
 
-This is an open-source file distributor designed to facilitate file sharing among users without requiring account creation. It’s a simple solution for distributing files quickly and efficiently.
+This is an open-source file distributor built using the <a href="https://create.t3.gg/">t3 stack</a>. It's designed to facilitate file sharing among users without requiring account creation. <br/>It's a simple solution for distributing files quickly and efficiently.
 
 ### Frontend
 
@@ -123,6 +121,12 @@ Run the project locally:
 ```bash
 npm run dev
 ```
+
+### Creating an Admin
+- Sign into the app
+- Open up the clerk dashboard
+- Select the user that you want to make an admin
+- Add this json data inside the metadata -> private data field: ```{ "role": "admin" }```
 
 
 ### License
